@@ -1,0 +1,52 @@
+# easy-rsa parameter settings
+
+export EASY_RSA="`pwd`"
+
+export OPENSSL="openssl"
+export PKCS11TOOL="pkcs11-tool"
+export GREP="grep"
+
+
+# This variable should point to
+# the openssl.cnf file included
+# with easy-rsa.
+export KEY_CONFIG=`$EASY_RSA/whichopensslcnf $EASY_RSA`
+
+export KEY_DIR="$EASY_RSA/keys"
+
+# Issue rm -rf warning
+echo NOTE: If you run ./clean-all, I will be doing a rm -rf on $KEY_DIR
+
+# PKCS11 fixes
+export PKCS11_MODULE_PATH="dummy"
+export PKCS11_PIN="dummy"
+
+export KEY_SIZE=2048
+
+# In how many days should the root CA key expire?
+export CA_EXPIRE=3650
+
+# In how many days should certificates expire?
+export KEY_EXPIRE=3650
+
+# These are the default values for fields
+# which will be placed in the certificate.
+# Don't leave any of these fields blank.
+export KEY_COUNTRY="IT"
+export KEY_PROVINCE="MI"
+export KEY_CITY="Milan"
+export KEY_ORG="fmount"
+export KEY_EMAIL="me@fmount.me"
+export KEY_OU="VPN Unit"
+
+# X509 Subject Field
+export KEY_NAME="server"
+
+# PKCS11 Smart Card
+# export PKCS11_MODULE_PATH="/usr/lib/changeme.so"
+# export PKCS11_PIN=1234
+
+# If you'd like to sign all keys with the same Common Name, uncomment the KEY_CN export below
+# You will also need to make sure your OpenVPN server config has the duplicate-cn option set
+export KEY_CN="server"
+

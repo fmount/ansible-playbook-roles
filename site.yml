@@ -1,0 +1,14 @@
+---
+- name: Gathering Facts
+  hosts: openvpn
+  remote_user: ansible
+  become: yes
+
+- name: apply openvpn role
+  hosts: openvpn
+  remote_user: ansible
+  become: yes
+
+  roles:
+    - openvpn
+

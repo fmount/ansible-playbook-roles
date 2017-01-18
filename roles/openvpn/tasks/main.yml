@@ -1,0 +1,5 @@
+---
+# tasks file for openvpn-playbook
+- include: configure-system.yml
+- include: install_packages.yml
+- include: install_ovpn.yml

@@ -1,0 +1,10 @@
+---
+# Configure common files / services
+- name: Set hostname
+  hostname: name={{ hostname }}
+
+#- name: Configure resolv.conf
+#template: src=etc/resolv.conf.j2 dest=/etc/resolv.conf owner=root group=root mode=0644 backup=yes
+
+- name: Ensure firewalld is removed
+  yum: state=absent name=firewalld

@@ -1,0 +1,33 @@
+---
+- name: Install openvpn packages
+  yum: name={{ item }} state=present
+  with_items:
+    - openvpn
+    - easy-rsa
+
+- name: Copy openvpn server template 
+  template: src=etc/openvpn/server.conf.j2 dest=/etc/openvpn/server.conf owner=root group=root mode=0644 backup=yes
+
+
+- name: Copy all the openvpn required keys and certs
+  copy: src=easy-rsa/keys/{{ item }} dest=/etc/openvpn/{{ item }} owner=root group=root mode=644 backup=yes
+  with_items:
+    - ca.crt
+    - server.key
+    - ta.key
+    - server.crt
+    - dh2048.pem
+
+
+- name: Copy all easy-rsa components
+  command: "cp -rf /usr/share/easy-rsa /etc/openvpn/"
+
+- name: Adding easy-rsa custom components
+  copy: src=easy-rsa/{{ item.var }} dest=/etc/openvpn/easy-rsa/{{ item.ver }}
+  with_items:
+    - { var: vars, ver: 2.0 } 
+
+- name: Start the OpenVPN service
+  service: name=openvpn@server state=started enabled=yes
+  become: yes
+  tags: openvpn

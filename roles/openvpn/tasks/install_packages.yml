@@ -1,0 +1,60 @@
+---
+- name: Install ntp 
+  yum: name=ntp state=present
+  tags: ntp
+
+- name: Configure ntp file
+  template: src=etc/ntp.conf.j2 dest=/etc/ntp.conf
+  tags: ntp
+  notify: restart ntp
+
+- name: Start the ntp service
+  service: name=ntpd state=started enabled=yes
+  tags: ntp
+
+- name: Install additional packages
+  yum: name={{ item }} state=present
+  with_items:
+   - epel-release
+   - tcpdump
+   - nmap
+   - rsync
+   - screen
+   - bzip2
+   - libsemanage-python
+   - gzip
+   - unzip
+   - zip
+   - bc
+   - libselinux-python
+   - policycoreutils-python
+   - sysstat
+   - wget
+   - vim-enhanced
+   - xz
+   - tree
+   - bash-completion
+   - dstat
+   - bind-utils
+   - net-tools
+   - iptables-services
+   - fail2ban
+   - sendmail
+
+- name: Start iptables 
+  service: name=iptables state=started enabled=yes
+  tags: iptables
+
+- name: Configure iptables file
+  template: src=etc/sysconfig/iptables.j2 dest=/etc/sysconfig/iptables
+  tags: iptables
+  notify: restart iptables
+
+- name: Configure sysctl.conf file
+  template: src=etc/sysctl.conf.j2 dest=/etc/sysctl.conf
+  notify: reload sysctl
+
+- name: Configure fail2ban on the vps
+  template: src=etc/fail2ban/jail.local dest=/etc/fail2ban/jail.local
+  notify: restart fail2ban
+

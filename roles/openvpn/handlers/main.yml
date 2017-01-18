@@ -1,0 +1,20 @@
+---
+- name: restart ntp
+  service: name=ntpd state=restarted
+
+- name: reload systemd
+  command: systemctl daemon-reload
+
+- name: restart sshd
+  service: name=sshd state=restarted
+
+- name: reload sysctl
+  #service: name=sysctl state=reload
+  shell: "sysctl -p"
+
+- name: restart iptables
+  service: name=iptables state=restarted
+
+- name: restart fail2ban
+  service: name=fail2ban state=restarted
+
