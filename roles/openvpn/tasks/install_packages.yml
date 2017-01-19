@@ -39,7 +39,8 @@
    - net-tools
    - iptables-services
    - fail2ban
-   - sendmail
+   - fail2ban-mail
+   - rsyslog
 
 - name: Start iptables 
   service: name=iptables state=started enabled=yes
@@ -58,3 +59,6 @@
   template: src=etc/fail2ban/jail.local dest=/etc/fail2ban/jail.local
   notify: restart fail2ban
 
+- name: Start Rsyslog
+  service: name=rsyslog state=started enabled=yes
+  tags: rsyslog

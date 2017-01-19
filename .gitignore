@@ -1,3 +1,4 @@
 *.retry
+hosts
 roles/openvpn/files/easy-rsa/keys/
 roles/openvpn/files/client/
