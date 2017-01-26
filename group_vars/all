@@ -3,3 +3,10 @@
 
 hostname: openvpnsever
 server: 64.137.166.195
+
+smtp_server: smtp:gmail.com
+smtp_port: 587
+
+# user:passwd for the sasl file
+sender_mail: YYYYY@gmail.com
+sender_pass: XXXXX

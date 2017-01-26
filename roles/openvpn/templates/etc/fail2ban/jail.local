@@ -223,7 +223,8 @@ action = %(action_)s
 
 [sshd]
 enabled = true
-port    = ssh
+#port    = ssh
+port = 2322
 logpath = %(sshd_log)s
 backend = %(sshd_backend)s
 
