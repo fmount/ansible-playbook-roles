@@ -1,0 +1,119 @@
+---
+- name: Create containers mountpoint volumes on the host
+  file: path=/mnt/nextcloud/{{ item }} state=directory mode=0755
+  with_items:
+  - db
+  - data
+  - apps
+  - themes
+  - config
+  become: yes
+
+- name: Create nginx config dir if it doesn't exist
+  file: path={{ item }} state=directory mode=0755
+  with_items:
+  - /home/{{ ansible_user_id }}/nxcloud/nginx/conf
+  - /home/{{ ansible_user_id }}/nxcloud/nginx/conf.d
+  - /home/{{ ansible_user_id }}/nxcloud/nginx/ssl
+
+- name: Copy config files
+  copy: src=files/etc/nginx/{{ item.src }} dest=/home/{{ ansible_user_id }}/nxcloud/nginx/{{ item.dst }} backup=yes
+  with_items:
+  - { src: "nginx.conf", dst: "nginx.conf" }
+  - { src: "conf/headers_params", dst: "conf/headers_params" }
+  - { src: "conf/proxy_params", dst: "conf/proxy_params" }
+  - { src: "conf/ssl_params.conf", dst: "conf/ssl_params.conf" }
+  - { src: "ssl/privkey.pem", dst: "ssl/privkey.pem" }
+  - { src: "ssl/fullchain.pem", dst: "ssl/fullchain.pem" }
+
+
+- name: Copy nginx virtualhost for nxcloud
+  template: src=etc/nginx/conf.d/{{ item.src }} dest=/home/{{ ansible_user_id }}/nxcloud/nginx/conf.d/{{ item.dst }} backup=yes
+  with_items:
+  - { src: "nxcloud-proxy.j2", dst: "nxcloud-proxy.conf" }
+
+- name: Create a network with options
+  docker_network:
+    name: "{{ docker_net }}"
+    driver_options:
+      com.docker.network.bridge.name: "{{ nextcloud_brg }}"
+    ipam_options:
+      subnet: "{{ docker_subnet }}"
+      gateway: "{{ docker_gw}}"
+  become: yes
+  ignore_errors: yes
+
+- name: mariadb container
+  docker_container:
+    name: "{{ mariadb_docker_name }}"
+    image: "{{ mariadb_docker_image }}"
+    state: started
+    restart: yes
+    pull: true
+    env:
+        MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
+        MYSQL_DATABASE: "{{ MYSQL_DATABASE }}"
+        MYSQL_USER: "{{ MYSQL_USER}}"
+        MYSQL_PASSWORD: "{{ MYSQL_PASSWORD }}"
+    volumes:
+    #- "{{ item }}"
+    #with_items:
+    - "{{ mariadb_volume }}"
+    networks:
+      - name: "{{ docker_net }}"
+  become: yes
+
+- name: nextcloud container
+  docker_container:
+    name: nextcloud
+    image: wonderfall/nextcloud
+    state: started
+    restart: yes
+    pull: true
+    #ports: "8888:8888"
+    networks:
+    - name: "{{ docker_net }}"
+    volumes:
+    #- /mnt/nextcloud/data:/data:Z
+    #- /mnt/nextcloud/config:/config:Z
+    #- /mnt/nextcloud/apps:/apps:Z
+    #- /mnt/nextcloud/themes:/nextcloud/themes:Z
+    #- "{{ item }}"
+    #with_items:
+    - "{{ nxcloud_data_volume }}"
+    - "{{ nxcloud_config_volume }}"
+    - "{{ nxcloud_apps_volume }}"
+    - "{{ nxcloud_themes_volume }}"
+    env:
+        UID: 1000
+        GID: 1000
+        UPLOAD_MAX_SIZE: 10G
+        APC_SHM_SIZE: 128M
+        CRON_PERIOD: 15m
+        TZ: Europe/Berlin
+        ADMIN_USER: "{{ admin_user }}"
+        ADMIN_PASSWORD: "{{ admin_password }}"
+        DOMAIN: "{{ domain }}"
+        DB_TYPE: "{{ DB_TYPE }}"
+        DB_NAME: "{{ DB_NAME }}"
+        DB_USER: "{{ DB_USER }}"
+        DB_PASSWORD: "{{ DB_PASSWORD }}"
+        DB_HOST: "{{ mariadb_docker_name }}"
+  become: yes
+
+- name: nextcloud reverse proxy
+  docker_container:
+    name: "{{ nginx_docker_name }}"
+    image: "{{ nginx_docker_image }}"
+    state: started
+    restart: yes
+    pull: true
+    ports: 
+    - "{{ nginx_http_ports }}"
+    - "{{ nginx_https_ports }}"
+    networks:
+    - name: "{{ docker_net }}"
+    volumes:
+      #- "{{ nginx_docker_volume }}"
+     - /home/{{ ansible_user_id }}/nginx:/etc/nginx:Z
+  become: yes

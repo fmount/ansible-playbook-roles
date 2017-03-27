@@ -42,6 +42,9 @@
    - fail2ban-mail
    - rsyslog
    - postfix
+   - docker
+   - docker-python
+   - certbot
 
 - name: Start iptables 
   service: name=iptables state=started enabled=yes
@@ -58,7 +61,6 @@
 - name: Reconf sshd port
   template: src=etc/ssh/sshd_config dest=/etc/sshd/sshd_config
   notify: restart sshd
-
 
 - name: Configure sysctl.conf file
   template: src=etc/sysctl.conf.j2 dest=/etc/sysctl.conf
@@ -81,3 +83,7 @@
 - name: Start Rsyslog
   service: name=rsyslog state=started enabled=yes
   tags: rsyslog
+
+- name: Start docker
+  service: name=docker state=started enabled=yes
+  tags: docker

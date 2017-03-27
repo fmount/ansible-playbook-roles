@@ -1,0 +1,23 @@
+server {
+  listen {{ nginx_http_port }};
+  server_name {{ server_name }};
+  return 301 https://$host$request_uri;
+}
+
+server {
+  listen {{ nginx_https_port }} ssl http2;
+  server_name {{ server_name }};
+
+  ssl_certificate {{ ssl_cert_path }};
+  ssl_certificate_key {{ ssl_key_path }};
+
+  include /etc/nginx/conf/ssl_params.conf;
+  include /etc/nginx/conf/headers_param;
+
+  client_max_body_size 10G;
+
+  location / {
+    proxy_pass http://{{ nextcloud_container_name }}: {{ nextcloud_container_port }};
+    include /etc/nginx/conf/proxy_params;
+  }
+}

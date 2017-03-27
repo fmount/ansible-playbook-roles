@@ -2,7 +2,7 @@
 # Variables listed here are applicable to all host groups
 
 hostname: openvpnsever
-server: 64.137.166.195
+server: X.Y.Z.W  #Ip address of your server
 
 smtp_server: smtp:gmail.com
 smtp_port: 587
@@ -10,3 +10,53 @@ smtp_port: 587
 # user:passwd for the sasl file
 sender_mail: YYYYY@gmail.com
 sender_pass: XXXXX
+
+
+# *** NextCloud ***
+
+docker_net: nextcloud_net
+nextcloud_brg: net2
+docker_subnet: 172.3.26.0/24
+docker_gw: 172.3.26.1
+
+mariadb_docker_name: nextcloud-db
+mariadb_docker_image: mariadb:latest
+MYSQL_ROOT_PASSWORD: nextcloud
+MYSQL_DATABASE: nextcloud
+MYSQL_USER: nextcloud
+MYSQL_PASSWORD: nextcloud
+
+nextcloud_docker_name: nextcloud
+nextcloud_docker_image: wonderfall/nextcloud
+
+# ** NextCloud Mariadb **
+
+admin_user: admin
+admin_password: admin
+domain: localhost # Insert your registered domain here yourdomain.org
+DBTYPE: mysql
+DB_NAME: nextcloud
+DB_USER: nextcloud
+DB_PASSWORD: nextcloud
+
+mariadb_volume: /mnt/nextcloud/db:/var/lib/mysql:Z
+
+# *** Nextcloud: Nginx  ***
+
+nginx_docker_name: nxcloud-nginx
+nginx_docker_image: nginx:alpine
+nginx_http_ports: "80:80"
+nginx_https_ports: "443:4430"
+server_name: nxcloud #Insert your server name here <yourdomain.org>
+nginx_http_port: 80
+nginx_https_port: 4430
+
+ssl_cert_path: /etc/nginx/ssl/fullchain.pem
+ssl_key_path: /etc/nginx/ssl/privkey.key
+
+nextcloud_container_name: nextcloud
+nextcloud_container_port: 8888
+nxcloud_data_volume: /mnt/nextcloud/data:/data:Z
+nxcloud_config_volume: /mnt/nextcloud/config:/config:Z
+nxcloud_apps_volume: /mnt/nextcloud/apps:/apps:Z
+nxcloud_themes_volume: /mnt/nextcloud/themes:/nextcloud/themes:Z

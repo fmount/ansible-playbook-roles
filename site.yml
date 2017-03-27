@@ -4,11 +4,24 @@
   remote_user: ansible
   become: yes
 
-- name: apply openvpn role
-  hosts: openvpn
-  remote_user: ansible
+#- name: apply openvpn role
+  #hosts: openvpn
+  #remote_user: ansible
+  #become: yes
+
+  #roles:
+  #  - openvpn
+
+
+- name: Gathering facts
+  hosts: nextcloud
+  remote_user: fastweb
   become: yes
 
+- name: apply nextcloud role
+  hosts: nextcloud
+  remote_user: fastweb
+
   roles:
-    - openvpn
+    - nextcloud
 

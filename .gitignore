@@ -2,3 +2,5 @@
 ^hosts
 roles/openvpn/files/easy-rsa/keys/
 roles/openvpn/files/client/
+roles/nextcloud/files/etc/letsencrypt
+roles/nextcloud/files/etc/nginx/ssl/
