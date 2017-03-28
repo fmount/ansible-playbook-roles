@@ -56,8 +56,6 @@
         MYSQL_USER: "{{ MYSQL_USER}}"
         MYSQL_PASSWORD: "{{ MYSQL_PASSWORD }}"
     volumes:
-    #- "{{ item }}"
-    #with_items:
     - "{{ mariadb_volume }}"
     networks:
       - name: "{{ docker_net }}"
@@ -70,16 +68,9 @@
     state: started
     restart: yes
     pull: true
-    #ports: "8888:8888"
     networks:
     - name: "{{ docker_net }}"
     volumes:
-    #- /mnt/nextcloud/data:/data:Z
-    #- /mnt/nextcloud/config:/config:Z
-    #- /mnt/nextcloud/apps:/apps:Z
-    #- /mnt/nextcloud/themes:/nextcloud/themes:Z
-    #- "{{ item }}"
-    #with_items:
     - "{{ nxcloud_data_volume }}"
     - "{{ nxcloud_config_volume }}"
     - "{{ nxcloud_apps_volume }}"
@@ -114,6 +105,8 @@
     networks:
     - name: "{{ docker_net }}"
     volumes:
-      #- "{{ nginx_docker_volume }}"
      - /home/{{ ansible_user_id }}/nginx:/etc/nginx:Z
   become: yes
+
+- name: Cron entry to renew letsencrypt cert
+  cron: name="renew cert" special_time="daily" job="certbot renew --quiet"
