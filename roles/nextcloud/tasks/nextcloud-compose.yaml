@@ -7,6 +7,7 @@
   - apps
   - themes
   - config
+  - external_volume
   become: yes
 
 - name: Create nginx config dir if it doesn't exist
@@ -20,6 +21,7 @@
   copy: src=files/etc/nginx/{{ item.src }} dest=/home/{{ ansible_user_id }}/nxcloud/nginx/{{ item.dst }} backup=yes
   with_items:
   - { src: "nginx.conf", dst: "nginx.conf" }
+  - { src: "mime.types", dst: "mime.types" }
   - { src: "conf/headers_params", dst: "conf/headers_params" }
   - { src: "conf/proxy_params", dst: "conf/proxy_params" }
   - { src: "conf/ssl_params.conf", dst: "conf/ssl_params.conf" }
@@ -75,6 +77,7 @@
     - "{{ nxcloud_config_volume }}"
     - "{{ nxcloud_apps_volume }}"
     - "{{ nxcloud_themes_volume }}"
+    - "{{ nxcloud_external_volume }}"
     env:
         UID: 1000
         GID: 1000
@@ -105,7 +108,7 @@
     networks:
     - name: "{{ docker_net }}"
     volumes:
-     - /home/{{ ansible_user_id }}/nginx:/etc/nginx:Z
+     - /home/{{ ansible_user_id }}/nxcloud/nginx:/etc/nginx:Z
   become: yes
 
 - name: Cron entry to renew letsencrypt cert
