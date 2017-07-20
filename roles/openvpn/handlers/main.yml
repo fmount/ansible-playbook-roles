@@ -13,7 +13,7 @@
   shell: "sysctl -p"
 
 - name: restart iptables
-  service: name=iptables state=restarted
+  service: name=iptables state=reload
 
 - name: restart fail2ban
   service: name=fail2ban state=restarted
